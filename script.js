@@ -82,7 +82,7 @@ const CONFIG = {
       name: "Friend 03",
       icon: "💌",
       hint: "Harapan",
-      title: "selamat ultah yang terbaik",
+      title: "selamat ultah GIRLIEE",
       text: "Halo cantik, SELAMAT ULANG TAHUN!! Semoga harimu indah dan kamu menikmati hari ulang tahunmu!! Semoga semua harapan dan impianmu terwujud... SELAMAT ULANG TAHUN!!!",
       author: "Gail your sistaco",
       isSpecial: false
@@ -106,45 +106,53 @@ const CONFIG = {
    ========================================================================== */
 
 /** Saves her thought from Screen 4 */
-function sendThoughtToServer(thoughtText) {
-  console.log("Saving thought to server:", thoughtText);
-  // Development fallback: saves in browser localStorage
+async function sendThoughtToServer(thoughtText) {
   try {
-    const data = { thought: thoughtText, date: new Date().toISOString() };
-    localStorage.setItem("her_birthday_thought", JSON.stringify(data));
-  } catch (e) {
-    console.warn("Could not write to localStorage", e);
-  }
+    const response = await fetch("https://formspree.io/f/xvkojgdb", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        type: "Birthday Thought",
+        message: thoughtText
+      })
+    });
 
-  // TO CONNECT BACKEND / WEBHOOK LATER:
-  /*
-  fetch('https://your-backend-api.com/api/save-thought', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ thought: thoughtText })
-  }).catch(err => console.error("Error saving thought:", err));
-  */
+    if (!response.ok) {
+      throw new Error("Failed to send thought");
+    }
+
+    console.log("Thought sent successfully!");
+  } catch (error) {
+    console.error("Error sending thought:", error);
+  }
 }
 
 /** Saves her wish from Slide 4 */
-function sendWishToServer(wishText) {
-  console.log("Saving wish to server:", wishText);
-  // Development fallback: saves in browser localStorage
+async function sendWishToServer(wishText) {
   try {
-    const data = { wish: wishText, date: new Date().toISOString() };
-    localStorage.setItem("her_birthday_wish", JSON.stringify(data));
-  } catch (e) {
-    console.warn("Could not write to localStorage", e);
-  }
+    const response = await fetch("https://formspree.io/f/xvkojgdb", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        type: "Birthday Wish",
+        message: wishText
+      })
+    });
 
-  // TO CONNECT BACKEND / WEBHOOK LATER:
-  /*
-  fetch('https://your-backend-api.com/api/save-wish', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ wish: wishText })
-  }).catch(err => console.error("Error saving wish:", err));
-  */
+    if (!response.ok) {
+      throw new Error("Failed to send wish");
+    }
+
+    console.log("Wish sent successfully!");
+  } catch (error) {
+    console.error("Error sending wish:", error);
+  }
 }
 
 /* ==========================================================================
@@ -738,6 +746,23 @@ function startMusicFadeIn() {
   });
 }
 
+function setupMusicVisibility() {
+  const music = document.getElementById("bgMusic");
+  if (!music) return;
+
+  let wasPlaying = false;
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      wasPlaying = !music.paused;
+      music.pause();
+    } else if (wasPlaying) {
+      music.play().catch(err => {
+        console.warn("Could not resume music:", err);
+      });
+    }
+  });
+}
 /* ==========================================================================
    SCREEN 5: 3D CIRCULAR ORBIT CAROUSEL LOGIC
    ========================================================================== */
@@ -1153,5 +1178,6 @@ function triggerConfetti() {
 window.addEventListener("DOMContentLoaded", () => {
   initAmbientCanvas();
   initAudioControls();
+  setupMusicVisibility();
   initLoadingScreen();
 });
