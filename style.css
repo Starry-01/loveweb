@@ -295,10 +295,20 @@ h1.screen-title i, h2.screen-title i, h2 i {
 
 .dancing-mascot {
   position: relative;
-  width: 70px;
-  height: 70px;
+  width: 130px;
+  height: 130px;
   display: grid;
   place-items: center;
+}
+
+.dancing-mascot .mascot-gif {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(255, 179, 198, 0.8));
+  position: relative;
+  z-index: 2;
 }
 
 .sparkle-orbit {
@@ -308,6 +318,7 @@ h1.screen-title i, h2.screen-title i, h2 i {
   border: 1.5px dashed var(--accent-purple);
   animation: mascotOrbit 3s linear infinite;
   box-shadow: 0 0 20px rgba(199, 125, 255, 0.3);
+  z-index: 1;
 }
 
 .mascot-core {
