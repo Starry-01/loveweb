@@ -62,9 +62,9 @@ const CONFIG = {
       name: "Friend 01",
       icon: "💌",
       hint: "Bestie wishes",
-      title: "To the sweetest soul!",
-      text: "Happy Birthday! May your day be filled with laughter, endless joy, and all your favorite treats!",
-      author: "Sarah",
+      title: " besti teraayang ",
+      text: "Happy Birthday! This is your happy day, I hope you will always be blessed with good health and loved by your family dan besstimu ini selalu ada buat kamu !",
+      author: "Alek berikan lelek",
       isSpecial: false
     },
     {
