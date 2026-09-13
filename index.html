@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Special Surprise ✦</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient Particle Canvas (Stars, floating glow, hearts) -->
+  <canvas id="ambientCanvas"></canvas>
+
+  <!-- Sound Toggle Control (Floating) -->
+  <div id="audioControl" class="audio-control hidden" title="Toggle background music">
+    <div class="audio-bars">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <span class="audio-label">Music</span>
+  </div>
+  <audio id="bgMusic" loop preload="auto">
+    <source src="assets/main-song.mp3" type="audio/mpeg">
+    <source src="assets/SunKissed Lola - Pasilyo (Lyrics) - Dan Music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- SCREEN 1: LOADING SCREEN -->
+  <div id="screen-loader" class="app-screen active">
+    <div class="loader-content">
+      <div class="dancing-mascot">
+        <div class="sparkle-orbit"></div>
+        <div class="mascot-core">✨</div>
+      </div>
+      <p class="loader-text">Preparing something special for you<span class="dot-anim"></span></p>
+      <div class="loader-bar-wrap">
+        <div class="loader-bar-fill" id="loaderProgress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: 3x3 PHOTO PUZZLE -->
+  <section id="screen-puzzle" class="app-screen">
+    <div class="screen-container">
+      <div class="puzzle-header">
+        <span class="badge">01 · A Little Challenge</span>
+        <h1 class="screen-title">First, put this <i>together.</i></h1>
+        <p class="screen-subtitle">Drag or tap pieces to swap them into the right places.</p>
+      </div>
+
+      <div class="puzzle-container">
+        <div id="puzzleBoard" class="puzzle-board" aria-label="3x3 photo puzzle board"></div>
+
+        <div class="puzzle-status-bar">
+          <p id="puzzleStatus" class="status-msg">Rearrange the 9 pieces to unlock the memory.</p>
+          <div class="puzzle-actions">
+            <button class="btn btn-secondary btn-sm" id="btnShuffle" onclick="shufflePuzzle()">Shuffle again</button>
+            <button class="btn btn-ghost btn-sm" id="btnPeek" onclick="togglePeekPreview()">Peek photo 👁️</button>
+          </div>
+        </div>
+
+        <div id="peekModal" class="peek-modal hidden" onclick="togglePeekPreview()">
+          <div class="peek-card" onclick="event.stopPropagation()">
+            <span class="peek-close" onclick="togglePeekPreview()">&times;</span>
+            <img id="peekImage" src="assets/puzzle-photo.jpg" alt="Memory preview">
+            <p class="peek-caption">Here is what the photo looks like!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: PHOTO REVEAL -->
+  <section id="screen-reveal" class="app-screen">
+    <div class="screen-container reveal-container">
+      <div class="reveal-content">
+        <span class="badge">Memory Unlocked ✦</span>
+        <div class="photo-frame-wrap">
+          <div class="photo-glow-border">
+            <img id="revealedPhoto" src="assets/puzzle-photo.jpg" alt="Our beautiful memory">
+          </div>
+        </div>
+        <h2 class="reveal-title">A memory worth <i>keeping.</i></h2>
+        <p class="reveal-quote" id="revealQuoteText">
+          "Every moment with you turns into a quiet little masterpiece."
+        </p>
+        <button class="btn btn-primary" onclick="proceedToGallery()">
+          See More Memories <span>✦</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 3.5: MULTI-PHOTO MEMORY GALLERY -->
+  <section id="screen-gallery" class="app-screen">
+    <div class="screen-container gallery-container">
+      <div class="gallery-header">
+        <span class="badge">Our Memory Album ✦</span>
+        <h2 class="screen-title">Our Little <i>Memories.</i></h2>
+        <p class="screen-subtitle">Swipe or drag to flip through moments captured in time.</p>
+      </div>
+
+      <div class="gallery-viewport" id="galleryViewport">
+        <div class="gallery-track" id="galleryTrack">
+          <!-- Dynamic memory photo slides injected by JS -->
+        </div>
+      </div>
+
+      <div class="gallery-nav-controls">
+        <button class="nav-arrow prev-arrow" onclick="prevGalleryPhoto()" aria-label="Previous photo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="gallery-dots" id="galleryDots">
+          <!-- Navigation dots injected by JS -->
+        </div>
+
+        <button class="nav-arrow next-arrow" onclick="nextGalleryPhoto()" aria-label="Next photo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <p class="gallery-caption" id="galleryCaptionText">Caption loading...</p>
+
+      <button class="btn btn-primary gallery-proceed-btn" onclick="proceedToThought()">
+        Continue <span>✦</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- SCREEN 4: ASK HER WHAT SHE THINKS -->
+  <section id="screen-thought" class="app-screen">
+    <div class="screen-container">
+      <div class="thought-card glass-card">
+        <span class="badge">A Question For You</span>
+        <h2 class="thought-title">What do you <i>think</i> about this?</h2>
+        <p class="thought-prompt">I'd love to know what's on your mind right now...</p>
+        
+        <div class="input-wrapper">
+          <textarea id="thoughtInput" placeholder="Tell me what you think... (anything at all ♡)" rows="4" maxlength="1000"></textarea>
+        </div>
+
+        <div class="thought-actions">
+          <button class="btn btn-primary" id="btnSendThought" onclick="handleSendThought()">
+            Send to me ♡
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 5: 4-PAGE CIRCULAR BIRTHDAY WORLD -->
+  <section id="screen-world" class="app-screen">
+    <!-- Magical Center Focal Point / Celestial Core -->
+<div class="celestial-center">
+  <div class="celestial-core">
+    <span>♥</span>
+  </div>
+
+  <div class="celestial-ring ring-1"></div>
+  <div class="celestial-ring ring-2"></div>
+</div>
+
+    <!-- 3D Orbit Carousel Viewport -->
+    <div class="carousel-viewport" id="carouselViewport">
+      <div class="carousel-track" id="carouselTrack">
+
+        <!-- SLIDE 1: PHOTO / OUR MEMORIES -->
+        <article class="carousel-card glass-card" data-slide="0" id="slide-0">
+          <div class="card-inner">
+            <span class="badge">01 · OUR MEMORIES</span>
+            <div class="slide-photo-frame album-frame">
+              <img id="worldSlidePhoto" src="assets/puzzle-photo.jpg" alt="Our memory album">
+              <div class="album-nav-overlay">
+                <button class="album-arrow album-prev" onclick="worldPrevPhoto()" aria-label="Previous photo">‹</button>
+                <button class="album-arrow album-next" onclick="worldNextPhoto()" aria-label="Next photo">›</button>
+              </div>
+            </div>
+            <h2 class="card-title">Our Little <i>Memories.</i></h2>
+            <p class="card-text" id="worldSlideCaption">
+              Every captured moment tells our story.
+            </p>
+            <div class="album-dots" id="worldAlbumDots">
+              <!-- Dots injected by JS -->
+            </div>
+          </div>
+        </article>
+
+        <!-- SLIDE 2: ROSE BOUQUET + QUOTES -->
+        <article class="carousel-card glass-card" data-slide="1" id="slide-1">
+          <div class="card-inner bouquet-slide-inner">
+            <span class="badge">02 · A BOUQUET FOR YOU</span>
+            <h2 class="card-title">A bouquet of <i>little notes.</i></h2>
+            <p class="card-text">Pick a rose to unfold a message chosen just for you.</p>
+
+            <div class="bouquet-visual">
+              <div class="bouquet-glow"></div>
+              <div class="roses-cluster" id="rosesCluster"></div>
+            </div>
+
+            <div class="bouquet-tags" id="bouquetTagsContainer"></div>
+          </div>
+        </article>
+
+        <!-- SLIDE 3: WORDS FROM FRIENDS + ME -->
+        <article class="carousel-card glass-card" data-slide="2" id="slide-2">
+          <div class="card-inner letters-slide-inner">
+            <span class="badge">03 · WORDS FOR YOU</span>
+            <h2 class="card-title">From the people who <i>cherish you.</i></h2>
+            <p class="card-text">Open any letter to read their heartfelt birthday messages.</p>
+
+            <div class="letters-grid" id="lettersGridContainer"></div>
+          </div>
+        </article>
+
+        <!-- SLIDE 4: HER WISH -->
+        <article class="carousel-card glass-card" data-slide="3" id="slide-3">
+          <div class="card-inner wish-slide-inner">
+            <span class="badge">04 · MAKE A WISH</span>
+            <h2 class="card-title">What do you <i>wish for</i> this year?</h2>
+            <p class="card-text">Close your eyes, make your dream wish, and whisper it here.</p>
+
+            <div class="wish-form-wrap" id="wishFormWrap">
+              <textarea id="wishInput" placeholder="My wish for this year is..." rows="4" maxlength="1000"></textarea>
+              <button class="btn btn-primary" id="btnSendWish" onclick="handleSendWish()">
+                Send My Wish ✦
+              </button>
+            </div>
+
+            <div id="wishConfirmation" class="wish-confirmation hidden">
+              <div class="confirm-icon">✦</div>
+              <h3>Wish received ✦</h3>
+              <p>Your wish is floating among the stars now. You can freely explore the memories anytime.</p>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- Carousel Controls -->
+    <div class="carousel-nav">
+      <button class="nav-arrow prev-arrow" id="btnPrevSlide" aria-label="Previous slide" onclick="prevSlide()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <div class="carousel-dots" id="carouselDots">
+        <button class="dot active" onclick="goToSlide(0)" aria-label="Slide 1"></button>
+        <button class="dot" onclick="goToSlide(1)" aria-label="Slide 2"></button>
+        <button class="dot" onclick="goToSlide(2)" aria-label="Slide 3"></button>
+        <button class="dot" onclick="goToSlide(3)" aria-label="Slide 4"></button>
+      </div>
+
+      <button class="nav-arrow next-arrow" id="btnNextSlide" aria-label="Next slide" onclick="nextSlide()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="carousel-hint">
+      <span>Swipe or drag horizontally to orbit</span>
+    </div>
+  </section>
+
+  <!-- MODAL DIALOG (For Bouquet Quotes & Letters) -->
+  <div id="messageModal" class="app-modal hidden" onclick="closeModal()">
+    <div class="modal-dialog glass-card" onclick="event.stopPropagation()">
+      <button class="modal-close-btn" onclick="closeModal()" aria-label="Close dialog">&times;</button>
+      <div class="modal-header">
+        <span class="badge" id="modalBadge">Letter</span>
+        <h3 class="modal-title" id="modalTitle">Title</h3>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <p class="modal-signature" id="modalSignature">— With love</p>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
